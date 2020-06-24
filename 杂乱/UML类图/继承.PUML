@@ -1,0 +1,14 @@
+@startuml 继承
+class Animal {
+    - Skin skin
+    - Eye eye
+}
+
+class Pet {
+    - Skin skin
+    - Eye eye
+    - String name
+}
+
+Pet -right-|> Animal
+@enduml

@@ -1,0 +1,17 @@
+@startuml 聚合
+class Car {
+    - String brand
+    - Engine engine
+    + void run()
+    + String get_engine_model()
+}
+
+class Engine {
+    - String model
+    - int max_speed
+    + String get_model()
+}
+
+Engine o--> Car
+
+@enduml
