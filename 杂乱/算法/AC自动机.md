@@ -50,7 +50,7 @@
     >
     > 一般使用失配指针时，结束条件应该是当前节点是根节点，并且处理过根节点下的节点。
     >
-    > 需要使用层序遍历来建立失配指针，否则会出现失配指针指向的节点的失配指针没有建立，导致程序逻辑错误。
+    > 需要使用bfs或层序遍历来建立失配指针，否则会出现失配指针指向的节点的失配指针没有建立，导致程序逻辑错误。
 
 ```Go
 package main
@@ -97,40 +97,33 @@ func setFail(root *AcAutoNode) {
 	// 添加失配指针，根节点的失配指针指向自身
 	queue := []*AcAutoNode{root}
 	root.faildNode = root
-	for {
-		length := len(queue)
-		if length == 0 {
-			break
-		}
-		// 层序遍历
-		for i := 0; i < length; i++ {
-			node := queue[0]
-			queue = queue[1:]
-			for k, childNode := range node.childNodes {
-				queue = append(queue, childNode)
-				if node == root {
-					// 如果是根节点的子节点，则失配指针指向根节点
-					node.childNodes[k].faildNode = root
-					continue
-				}
-				// 初始化：失配指针指向失配节点（本身匹配成功，但是后续匹配失败的节点）的父节点
-				// 循环：失配指针查找失配节点的父节点的失配指针，并指向该失配指针
-				// 终止： 失配指针下找到目标k，此时节点的失配指针为目标k。失配指针指向root且root下无k
-				fail := node
-				for {
-					fail = fail.faildNode
-					if _, ok := fail.childNodes[k]; ok {
-						fail = fail.childNodes[k]
-						break
-					}
-					if fail == root {
-						break
-					}
-				}
-				// 更新失配指针
-				node.childNodes[k].faildNode = fail
-				node.childNodes[k].end = append(node.childNodes[k].end, fail.end...)
+	for len(queue) != 0 {
+		node := queue[0]
+		queue = queue[1:]
+		for k, childNode := range node.childNodes {
+			queue = append(queue, childNode)
+			if node == root {
+				// 如果是根节点的子节点，则失配指针指向根节点
+				node.childNodes[k].faildNode = root
+				continue
 			}
+			// 初始化：失配指针指向失配节点（本身匹配成功，但是后续匹配失败的节点）的父节点
+			// 循环：失配指针查找失配节点的父节点的失配指针，并指向该失配指针
+			// 终止： 失配指针下找到目标k，此时节点的失配指针为目标k。失配指针指向root且root下无k
+			fail := node
+			for {
+				fail = fail.faildNode
+				if _, ok := fail.childNodes[k]; ok {
+					fail = fail.childNodes[k]
+					break
+				}
+				if fail == root {
+					break
+				}
+			}
+			// 更新失配指针
+			node.childNodes[k].faildNode = fail
+			node.childNodes[k].end = append(node.childNodes[k].end, fail.end...)
 		}
 	}
 }
